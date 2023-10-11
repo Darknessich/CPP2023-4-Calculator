@@ -1,26 +1,13 @@
 ﻿#include "Calculator.h"
-#include "Operators/StandardOps.h"
-
-Calculator::Calculator()
-  : pluginsPath("plugins")
-{}
 
 Calculator::Calculator(int argc, char* argv[]) 
-  : Calculator() 
+  : pluginsPath(argc > 1? argv[1] : "plugins"), solver()
 {
-  if (argc > 1) 
-    pluginsPath = argv[1];
-}
-
-void Calculator::loadOps() {
-  this->opers.push_back(new Plus());
-  this->opers.push_back(new Minus());
-  this->opers.push_back(new Product());
-  this->opers.push_back(new Division());
-}
-
-bool Calculator::init() {
-  return true;
+#ifndef NDEBUG
+  std::cout << "load " << solver.loadPlugins(this->pluginsPath) << " plugins" << std::endl;
+#else
+  solver.loadPlugins(this->pluginsPath);
+#endif
 }
 
 int Calculator::exec(std::istream& is, std::ostream& os) {
@@ -28,7 +15,7 @@ int Calculator::exec(std::istream& is, std::ostream& os) {
   std::string exp;
   std::getline(is, exp);
   while (!is.eof()) {
-    os << exp << std::endl;
+    os << "\t= " <<  solver.calculate(exp) << std::endl;
     std::getline(is, exp);
   }
 
