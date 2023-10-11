@@ -56,7 +56,7 @@ std::string getFloating(std::string const& exp, size_t& it) {
 std::vector<Token*> Parser::parse(std::string const& exp) const {
   size_t cnt = 0;
   std::string op;
-  bool prevop = false;
+  bool prevop = true;
   std::vector<Token*> tokens;
 
   while (cnt < exp.size()) {

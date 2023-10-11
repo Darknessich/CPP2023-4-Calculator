@@ -12,9 +12,12 @@ enum class EPriority {
 class Operator {
 public:
   virtual double operator()() const = 0;
-  virtual size_t getnArgs() const = 0;
   virtual EPriority getPriority() const = 0;
   virtual std::string getName() const = 0;
+  
+  virtual bool isFunction() const = 0;
+  virtual size_t getnArgs() const = 0;
   virtual void setArg(size_t narg, double arg) = 0;
+
   virtual ~Operator() = default;
 };

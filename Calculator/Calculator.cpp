@@ -15,7 +15,7 @@ int Calculator::exec(std::istream& is, std::ostream& os) {
   std::string exp;
   std::getline(is, exp);
   while (!is.eof()) {
-    os << solver.calculate(exp) << std::endl;
+    os << "\t= " <<  solver.calculate(exp) << std::endl;
     std::getline(is, exp);
   }
 
