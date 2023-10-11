@@ -14,6 +14,6 @@ private:
   double args[2] = { 0 };
 };
 
-__declspec(dllexport) Pow* Create() {
+extern "C" __declspec(dllexport) Operator* create() {
   return new Pow();
 }

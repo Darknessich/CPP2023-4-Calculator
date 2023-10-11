@@ -2,27 +2,11 @@
 #include "Loader.h"
 #include "Operators/StandardOps.h"
 
-class Sin2 : public Operator {
-public:
-  double operator()() const override { return args[0] * args[1]; }
-  EPriority getPriority() const override { return EPriority::P_AVERAGE; }
-  std::string getName() const override { return "sin2"; }
-
-  bool isFunction() const override { return true; };
-  size_t getnArgs() const override { return 2; }
-  void setArg(size_t narg, double arg) override { args[narg] = arg; }
-private:
-  double args[2] = { 0 };
-};
-
 Solver::Solver() {
   for (auto op : getStandardOps()) {
     this->operators[op->getName()] = op;
     this->parser.addName(op->getName());
   }
-
-  this->operators["sin2"] = new Sin2();
-  this->parser.addName("sin2");
 }
 
 size_t Solver::loadPlugins(std::string path) {
@@ -133,29 +117,37 @@ std::vector<Token*> Solver::reverseExpression(std::vector<Token*> const& tokens)
 
 double Solver::calculate(std::string const& exp) {
   this->tokens = reverseExpression(parser.parse(exp));
+  
+  while (!this->values.empty())
+    this->values.pop();
 
   for (auto lex : tokens) {
     if (lex->type == Token::EType::T_NUMBER)
-      values.push(std::stod(lex->str));
+      this->values.push(std::stod(lex->str));
     else {
       Operator* op = operators[lex->str];
-      for (int i = op->getnArgs() - 1; i >= 0 ; i--) {
-        if (values.empty()) {
+      for (int i = static_cast<int>(op->getnArgs()) - 1; i >= 0 ; i--) {
+        if (this->values.empty()) {
           // Error
           return 0.0;
         }
         
         op->setArg(i, values.top());
-        values.pop();
+        this->values.pop();
       }
-      values.push((*op)());
+      this->values.push((*op)());
     }
   }
 
-  double ans = values.top();
-  values.pop();
+  if (this->values.empty()) {
+    // Error
+    return 0.0;
+  }
 
-  if (!values.empty()) {
+  double ans = this->values.top();
+  this->values.pop();
+
+  if (!this->values.empty()) {
     // Error
     return 0.0;
   }
