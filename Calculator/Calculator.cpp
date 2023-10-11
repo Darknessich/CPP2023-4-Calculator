@@ -1,25 +1,15 @@
 ﻿#include "Calculator.h"
-#include "Operators/StandardOps.h"
 
-Calculator::Calculator()
-  : pluginsPath("plugins")
-{}
+auto& debug = std::cout;
 
 Calculator::Calculator(int argc, char* argv[]) 
-  : Calculator() 
-{
-  if (argc > 1) 
-    pluginsPath = argv[1];
-}
-
-void Calculator::loadOps() {
-  this->opers.push_back(new Plus());
-  this->opers.push_back(new Minus());
-  this->opers.push_back(new Product());
-  this->opers.push_back(new Division());
-}
+  : pluginsPath(argc > 1? argv[1] : "plugins"), solver()
+{}
 
 bool Calculator::init() {
+  auto& debug = std::cout;
+  debug << "load " << solver.loadPlugins(pluginsPath) << " plugins" << std::endl;
+  
   return true;
 }
 

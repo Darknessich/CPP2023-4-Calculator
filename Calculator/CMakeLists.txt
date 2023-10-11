@@ -7,4 +7,8 @@ add_executable (Calculator
   "Calculator.h"  
   "Operators/Operator.h"
   "Operators/StandardOps.h" 
-  "DllReader.h" "DllReader.cpp")
+  "Loader.h" 
+  "Loader.cpp" 
+  "Solver.h" 
+  "Solver.cpp"
+)

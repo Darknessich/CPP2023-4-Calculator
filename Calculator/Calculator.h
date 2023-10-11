@@ -1,21 +1,17 @@
 ﻿#pragma once
 #include <string>
-#include <vector>
 #include <iostream>
-#include "Operators/Operator.h"
+
+#include "Solver.h"
 
 class Calculator {
 public:
-  Calculator();
-  Calculator(int argc, char* argv[]);
+  Calculator(int argc = 0, char* argv[] = nullptr);
 
   bool init();
   int exec(std::istream& is = std::cin, std::ostream& os = std::cout);
-  std::vector<Operator*> const& getOperators();
 
-private:
-  void loadOps();
-
+private:  
   std::string pluginsPath;
-  std::vector<Operator*> opers;
+  Solver solver;
 };

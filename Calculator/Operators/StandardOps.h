@@ -1,4 +1,6 @@
 #pragma once
+#include <vector>
+
 #include "Operator.h"
 
 class Plus : public Operator {
@@ -44,3 +46,7 @@ public:
 private:
   double args[2];
 };
+
+std::vector<Operator*> getStandardOps() {
+  return { new Plus(), new Minus(), new Product(), new Division() };
+}
