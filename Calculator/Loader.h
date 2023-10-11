@@ -4,7 +4,9 @@
 
 class Loader {
 public:
-  Loader(std::string path);
+  Loader(std::string const& path);
+
+  Operator* get() const;
   Operator* next();
 
 private:

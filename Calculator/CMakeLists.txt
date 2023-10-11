@@ -11,4 +11,4 @@ add_executable (Calculator
   "Loader.cpp" 
   "Solver.h" 
   "Solver.cpp"
-)
+ "Parser.cpp" "Parser.h"  )

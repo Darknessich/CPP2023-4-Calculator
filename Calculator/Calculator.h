@@ -8,7 +8,6 @@ class Calculator {
 public:
   Calculator(int argc = 0, char* argv[] = nullptr);
 
-  bool init();
   int exec(std::istream& is = std::cin, std::ostream& os = std::cout);
 
 private:  

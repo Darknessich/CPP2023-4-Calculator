@@ -1,16 +1,13 @@
 ﻿#include "Calculator.h"
 
-auto& debug = std::cout;
-
 Calculator::Calculator(int argc, char* argv[]) 
   : pluginsPath(argc > 1? argv[1] : "plugins"), solver()
-{}
-
-bool Calculator::init() {
-  auto& debug = std::cout;
-  debug << "load " << solver.loadPlugins(pluginsPath) << " plugins" << std::endl;
-  
-  return true;
+{
+#ifndef NDEBUG
+  std::cout << "load " << solver.loadPlugins(this->pluginsPath) << " plugins" << std::endl;
+#else
+  solver.loadPlugins(this->pluginsPath);
+#endif
 }
 
 int Calculator::exec(std::istream& is, std::ostream& os) {
@@ -18,7 +15,7 @@ int Calculator::exec(std::istream& is, std::ostream& os) {
   std::string exp;
   std::getline(is, exp);
   while (!is.eof()) {
-    os << exp << std::endl;
+    os << solver.calculate(exp) << std::endl;
     std::getline(is, exp);
   }
 
