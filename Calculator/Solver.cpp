@@ -88,7 +88,7 @@ VShptrT Solver::reverseExpression(VShptrT const& tokens) {
         break;
       }
 
-      while (!st.empty() && isOp(st.top().get()) && !higherPriority(lex.get(), st.top().get())) {
+      while (!st.empty() && isOp(st.top().get()) && !isFunc(st.top().get()) && !higherPriority(lex.get(), st.top().get())) {
         reverseTokens.push_back(st.top());
         st.pop();
       }
