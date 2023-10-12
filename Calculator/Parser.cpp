@@ -1,5 +1,8 @@
 #include "Parser.h"
 
+using shptrT = std::shared_ptr<Token>;
+using VShptrT = std::vector<shptrT>;
+
 void Parser::addName(std::string const& name) {
   this->opNames.insert(name);
   this->sizes.insert(name.size());
@@ -53,11 +56,11 @@ std::string getFloating(std::string const& exp, size_t& it) {
   return ans;
 }
 
-std::vector<Token*> Parser::parse(std::string const& exp) const {
+VShptrT Parser::parse(std::string const& exp) const {
   size_t cnt = 0;
   std::string op;
   bool prevop = true;
-  std::vector<Token*> tokens;
+  VShptrT tokens;
 
   while (cnt < exp.size()) {
     if (isspace(exp[cnt])) {
@@ -68,7 +71,7 @@ std::vector<Token*> Parser::parse(std::string const& exp) const {
       tokens.emplace_back(new Token{Token::EType::T_NUMBER, getFloating(exp, cnt)});
     }
     else if (isBracket(exp[cnt])) {
-      prevop = true;
+      prevop = exp[cnt] == '(';
       tokens.emplace_back(new Token{ Token::EType::T_BRACKET, exp.substr(cnt++, 1)});
     }
     else if (isSeparator(exp[cnt])) {
@@ -81,7 +84,7 @@ std::vector<Token*> Parser::parse(std::string const& exp) const {
       tokens.emplace_back(new Token{ Token::EType::T_OPERATOR, op}); 
     }
     else {
-      tokens.emplace_back(new Token{ Token::EType::T_NONE, ""});
+      tokens.emplace_back(new Token{ Token::EType::T_NONE, exp.substr(cnt, 1)});
       break;
     }
   }

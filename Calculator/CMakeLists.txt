@@ -7,8 +7,11 @@ add_executable (Calculator
   "Calculator.h"  
   "Operators/Operator.h"
   "Operators/StandardOps.h" 
+  "Operators/StandardOps.cpp"
   "Loader.h" 
   "Loader.cpp" 
   "Solver.h" 
   "Solver.cpp"
- "Parser.cpp" "Parser.h"  )
+  "Parser.cpp" 
+  "Parser.h"  
+ )
