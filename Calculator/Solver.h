@@ -2,13 +2,24 @@
 #include <string>
 #include <vector>
 #include <stack>
+#include <memory>
+#include <exception>
 #include <unordered_map>
 
 #include "Parser.h"
 #include "Operators/Operator.h"
 
+class SolverErr : public std::exception {
+public:
+  using std::exception::exception;
+};
+
 class Solver {
-  std::vector<Token*> reverseExpression(std::vector<Token*> const& tokens);
+  using shptrT = std::shared_ptr<Token>;
+  using shptrOp = std::shared_ptr<Operator>;
+
+  std::vector<shptrT> reverseExpression(std::vector<shptrT> const& tokens);
+  void clearStack();
 public:
   Solver();
   
@@ -17,8 +28,8 @@ public:
 
 private:
   Parser parser;
-  std::vector<Token*> tokens;
-  std::unordered_map<std::string, Operator*> operators;
+  std::vector<shptrT> tokens;
+  std::unordered_map<std::string, shptrOp> operators;
 
   std::stack<double> values;
 };

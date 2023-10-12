@@ -2,6 +2,7 @@
 #include <string>
 
 enum class EPriority {
+  P_FUNCTION,
   P_UPPER,
   P_HIGH,
   P_AVERAGE,

@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <memory>
 #include <unordered_set>
 #include <set>
 
@@ -16,11 +17,12 @@ struct Token {
 };
 
 class Parser {
-  bool isOpName(std::string const& exp, size_t it, std::string& name) const;
+  using shprtT = std::shared_ptr<Token>;
 
+  bool isOpName(std::string const& exp, size_t it, std::string& name) const;
 public:
   void addName(std::string const& opName);
-  std::vector<Token*> parse(std::string const& exp) const;
+  std::vector<shprtT> parse(std::string const& exp) const;
 private:
   std::unordered_set<std::string> opNames;
   std::set<size_t> sizes;
