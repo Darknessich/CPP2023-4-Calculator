@@ -2,7 +2,7 @@
 #include "Loader.h"
 
 Calculator::Calculator(int argc, char* argv[]) 
-  : pluginsPath(argc > 1? argv[1] : "plugins") /*solver()*/
+  : pluginsPath(argc > 1? argv[1] : "plugins")
 {
   size_t plugins = 0;
 

@@ -51,7 +51,7 @@ std::string getFloating(std::string const& exp, size_t& it) {
     it2++;
   }
 
-  std::string ans(((tmp == 1 ? "" : "-") + exp.substr(it, subsize)));
+  std::string ans(((tmp == 1 ? "+" : "-") + exp.substr(it, subsize)));
   it = it2;
   return ans;
 }
