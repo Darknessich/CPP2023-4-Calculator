@@ -36,6 +36,7 @@ bool Division::isFunction() const  { return false; };
 size_t Division::getnArgs() const  { return 2; }
 void Division::setArg(size_t narg, double arg)  { args[narg] = arg; }
 
+
 std::vector<Operator*> getStandardOps() {
   return { new Plus(), new Minus(), new Product(), new Division() };
 }
