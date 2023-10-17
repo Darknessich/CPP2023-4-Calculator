@@ -6,6 +6,7 @@ add_executable (Calculator
   "Calculator.cpp" 
   "Calculator.h"  
   "Operators/Operator.h"
+  
   "Operators/StandardOps.h" 
   "Operators/StandardOps.cpp"
   "Loader.h" 

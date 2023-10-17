@@ -4,11 +4,9 @@
 Calculator::Calculator(int argc, char* argv[]) 
   : pluginsPath(argc > 1? argv[1] : "plugins")
 {
-  size_t plugins = 0;
-
   try {
-    plugins = solver.loadPlugins(this->pluginsPath);
-    std::cout << "[ INFO] " << plugins << " plugins loaded successfully" << std::endl;
+    auto plugins = solver.loadPlugins(this->pluginsPath);
+    std::cout << "[ INFO] [" << plugins .first << " / " << plugins.second << "] plugins loaded successfully" << std::endl;
   } catch (LoaderErr& err) {
     std::cerr << "[ERROR] " << err.what() << std::endl;
     throw;

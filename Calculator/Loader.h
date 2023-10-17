@@ -12,15 +12,24 @@ public:
 };
 
 class Loader {
+  using unqOperator = std::unique_ptr<Operator>;
+  using Fabric = Operator*(*)(void);
+
+  void getFabric(std::string const& path);
 public:
   Loader(std::string const& path);
   ~Loader() noexcept;
 
-  std::shared_ptr<Operator> get() const noexcept;
-  std::shared_ptr<Operator> next();
+  unqOperator get() const noexcept;
+  unqOperator next();
+  bool isEnd() const;
+
 private:
   std::string path;
-  WIN32_FIND_DATAA winfd;
+  
   HANDLE hfind;
-  std::shared_ptr<Operator> curr;
+  WIN32_FIND_DATAA winfd;
+  
+  Fabric creator;
+  bool end;
 };

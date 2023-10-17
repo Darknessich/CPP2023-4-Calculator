@@ -15,21 +15,22 @@ public:
 };
 
 class Solver {
-  using shptrT = std::shared_ptr<Token>;
-  using shptrOp = std::shared_ptr<Operator>;
+  using shToken = std::shared_ptr<Token>;
+  using Tokens = std::vector<shToken>;
+  using unqOperator = std::unique_ptr<Operator>;
 
-  std::vector<shptrT> reverseExpression(std::vector<shptrT> const& tokens);
+  Tokens reverseExpression(Tokens const& tokens);
   void clearStack();
 public:
   Solver();
   
-  size_t loadPlugins(std::string path);
+  std::pair<size_t, size_t> loadPlugins(std::string path);
   double calculate(std::string const& expression);
 
 private:
   Parser parser;
-  std::vector<shptrT> tokens;
-  std::unordered_map<std::string, shptrOp> operators;
+  Tokens tokens;
+  std::unordered_map<std::string, unqOperator> operators;
 
   std::stack<double> values;
 };

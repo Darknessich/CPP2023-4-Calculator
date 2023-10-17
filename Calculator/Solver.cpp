@@ -2,31 +2,35 @@
 #include "Loader.h"
 #include "Operators/StandardOps.h"
 
-using shptrT = std::shared_ptr<Token>;
-using VShptrT = std::vector<shptrT>;
+using shToken = std::shared_ptr<Token>;
+using Tokens = std::vector<shToken>;
 
 Solver::Solver() {
-  for (auto op : getStandardOps()) {
-    this->operators[op->getName()] = std::shared_ptr<Operator>(op);
+  for (auto&& op : getStandardOps()) {
     this->parser.addName(op->getName());
+    this->operators.insert({op->getName(), std::move(op)});
   }
 }
 
-size_t Solver::loadPlugins(std::string path) {
+std::pair<size_t, size_t> Solver::loadPlugins(std::string path) {
   Loader loader(path);
   size_t cnt = 0;
+  size_t success = 0;
 
-  for (auto op = loader.get(); op != nullptr; op = loader.next(), cnt++) {
-    this->operators[op->getName()] = op;
-    this->parser.addName(op->getName());
+  for (auto&& op = loader.get(); !loader.isEnd(); op = loader.next(), cnt++) {
+    if (op != nullptr) {
+      success++;
+      this->parser.addName(op->getName());
+      this->operators.insert({op->getName(), std::move(op)});
+    }
   }
 
-  return cnt;
+  return { success, cnt };
 }
 
-VShptrT Solver::reverseExpression(VShptrT const& tokens) {
-  VShptrT reverseTokens;
-  std::stack<shptrT> st;
+Tokens Solver::reverseExpression(Tokens const& tokens) {
+  Tokens reverseTokens;
+  std::stack<shToken> st;
 
   auto isBracket = [](Token* tk) -> bool {
     return tk->type == Token::EType::T_BRACKET;
@@ -131,7 +135,7 @@ double Solver::calculate(std::string const& exp) {
       }
     }
     else {
-      std::shared_ptr<Operator> op = operators[lex->str];
+      Operator * const op = operators[lex->str].get();
       for (int i = static_cast<int>(op->getnArgs()) - 1; i >= 0 ; i--) {
         if (this->values.empty())
           throw SolverErr("Too few operands");

@@ -1,40 +1,50 @@
 #include "Loader.h"
 
-std::shared_ptr<Operator> getOp(std::string const& path) {
+void Loader::getFabric(std::string const& path) {
   HMODULE hm = LoadLibraryA(path.c_str());
 
   if (hm == nullptr)
     throw LoaderErr(("File \"" + path + "\" not found").c_str());
 
-  Operator* (*create)() = reinterpret_cast<Operator*(*)()>(GetProcAddress(hm, "create"));
+  creator = reinterpret_cast<Fabric>(GetProcAddress(hm, "create"));
 
-  if (!create) 
+  if (!creator) 
     throw LoaderErr(("Òo instance of the function \"Operator* create(void)\" in \"" + path + "\"").c_str());
-
-  return std::shared_ptr<Operator>(create());
 }
 
 Loader::Loader(std::string const& path)
-  : path(path), curr(nullptr)
+  : path(path), creator(nullptr), end(false)
 {
   this->hfind = FindFirstFileA((this->path + std::string("\\*.dll")).c_str(), &winfd);
-  this->curr = (hfind == INVALID_HANDLE_VALUE ? nullptr : getOp(this->path + "\\" + winfd.cFileName));
+  
+  if (hfind != INVALID_HANDLE_VALUE)
+    getFabric(this->path + "\\" + winfd.cFileName);
+  else
+    end = true;
 }
 
 Loader::~Loader() noexcept {
   FindClose(hfind);
 }
 
-std::shared_ptr<Operator> Loader::get() const noexcept {
-  return curr;
+bool Loader::isEnd() const {
+  return end;
 }
 
-std::shared_ptr<Operator> Loader::next() {
-  if (!curr || FindNextFileA(hfind, &winfd) == NULL)
-    curr = nullptr;
-  else {
-    this->curr = getOp(this->path + "\\" + winfd.cFileName);
+std::unique_ptr<Operator> Loader::get() const noexcept {
+  return unqOperator(creator? creator() : nullptr);
+}
+
+std::unique_ptr<Operator> Loader::next() {
+  if (end) 
+    return nullptr;
+
+  if (FindNextFileA(hfind, &winfd) == NULL) {
+    end = true;
+    creator = nullptr;
+    return nullptr;
   }
 
-  return curr;
+  getFabric(this->path + "\\" + winfd.cFileName);
+  return get();
 }
