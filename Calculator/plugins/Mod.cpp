@@ -13,6 +13,7 @@ public:
 
   EPriority getPriority() const override { return EPriority::P_UPPER; }
   std::string getName() const override { return "mod"; }
+  std::string getDescription() const override { return "int(a) mod int(b)"; }
 
   void setArg(size_t narg, double arg) override { args[narg] = static_cast<int>(arg); }
 private:

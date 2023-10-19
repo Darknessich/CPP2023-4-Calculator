@@ -21,6 +21,7 @@ public:
   virtual double operator()() const = 0;
   
   virtual std::string getName() const = 0;
+  virtual std::string getDescription() const = 0;
   virtual EPriority getPriority() const = 0;
   virtual void setArg(size_t narg, double arg) = 0;
   

@@ -5,10 +5,12 @@
 #include <iomanip>
 
 Solver::Solver()
-  : validator(this), flipper(this)
+  : parser(std::make_unique<Parser>()), 
+  validator(std::make_unique<Validator>(this)), 
+  flipper(std::make_unique<Flipper>(this))
 {
   for (auto&& op : getStandardOps()) {
-    this->parser.addOperator(op->getName(), op->isFunction());
+    this->parser->addOperator(op->getName(), op->isFunction());
     this->operators.insert({ op->getName(), std::move(op) });
   }
 }
@@ -21,7 +23,7 @@ std::pair<size_t, size_t> Solver::loadPlugins(std::string path) {
   for (auto&& op = loader.get(); !loader.isEnd(); op = loader.next(), cnt++) {
     if (op != nullptr) {
       success++;
-      this->parser.addOperator(op->getName(), op->isFunction());
+      this->parser->addOperator(op->getName(), op->isFunction());
       this->operators.insert({ op->getName(), std::move(op) });
     }
   }
@@ -47,21 +49,26 @@ std::string formatToStr(EFormat fmt) {
   case EFormat::F_POSTFIX:
     return "postfix";
   }
+  
+  return "";
 }
 
 void Solver::printInfo(std::ostream& os) const {
   using namespace std;
-  os << setw(12) << left << "Type";
-  os << setw(12) << left << "Name";
-  os << setw(12) << left << "Format";
-  os << setw(12) << left << "cargs";
+  const size_t columnw = 12;
+  os << setw(columnw) << left << "Type";
+  os << setw(columnw) << left << "Name";
+  os << setw(columnw) << left << "Format";
+  os << setw(columnw) << left << "cargs";
+  os << setw(columnw) << left << "description";
   os << endl;
 
   for (auto const& [name, op] : this->operators) {
-    os << setw(12) << left << typeToStr(op->isFunction());
-    os << setw(12) << left << name;
-    os << setw(12) << left << formatToStr(op->getFormat());
-    os << setw(12) << left << std::to_string(op->getnArgs());
+    os << setw(columnw) << left << typeToStr(op->isFunction());
+    os << setw(columnw) << left << name;
+    os << setw(columnw) << left << formatToStr(op->getFormat());
+    os << setw(columnw) << left << std::to_string(op->getnArgs());
+    os << setw(columnw) << left << op->getDescription();
     os << endl;
   }
 
@@ -117,12 +124,12 @@ double Solver::calculateState(bool& ok, std::string& msg) {
 
 double Solver::calculate(std::string const& exp, bool& ok, std::string& msg) {
   this->values = std::stack<double>();
-  this->tokens = parser.parse(exp);
+  this->tokens = parser->parse(exp);
 
-  if (!(ok = validator.validate(this->tokens, msg)))
+  if (!(ok = validator->validate(this->tokens, msg)))
     return 0.0;
 
-  if (!(ok = flipper.flip(this->tokens, msg)))
+  if (!(ok = flipper->flip(this->tokens, msg)))
     return 0.0;
 
   for (auto const& token : this->tokens) {

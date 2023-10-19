@@ -1,9 +1,9 @@
 ﻿#include "Calculator.h"
 
 Calculator::Calculator(int argc, char* argv[]) 
-  : pluginsPath(argc > 1? argv[1] : "plugins")
+  : pluginsPath(argc > 1? argv[1] : "plugins"), solver(std::make_unique<Solver>())
 {
-  auto plugins = solver.loadPlugins(this->pluginsPath);
+  auto plugins = solver->loadPlugins(this->pluginsPath);
   std::cout << "[ INFO] (" << plugins.first << " / " << plugins.second;
   std::cout << ") plugins loaded successfully" << std::endl;
 }
@@ -13,11 +13,12 @@ int Calculator::exec(std::istream& is, std::ostream& os) {
   bool check;
 
   os << "[ INFO] Available operators:" << std::endl;
-  solver.printInfo(os);
+  solver->printInfo(os);
+
   os << "[ INFO] Enter ^Z (EOF) for exit" << std::endl;
   std::getline(is, exp);
   while (!is.eof()) {
-    double result = solver.calculate(exp, check, msg);
+    double result = solver->calculate(exp, check, msg);
     if (check)
       os << "\t= " << result << std::endl;
     else

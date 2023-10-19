@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <string>
+#include <memory>
 #include <iostream>
 
 #include "Logics/Solver.h"
@@ -11,5 +12,5 @@ public:
 
 private:  
   std::string pluginsPath;
-  Solver solver;
+  std::unique_ptr<Solver> solver;
 };

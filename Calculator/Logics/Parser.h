@@ -24,10 +24,10 @@ struct Token {
 
 class Parser {
   using shToken = std::shared_ptr<Token>;
-  
+
   struct State {
-    bool beSigned = true;
-    size_t idx = 0;
+    bool beSigned = true;   ///< can + or -be a sign?
+    size_t idx = 0;         ///< current token number
   };
   
   bool isNumber(std::string const& exp) const;
@@ -43,6 +43,7 @@ class Parser {
   shToken getToken(std::string const& exp);
 
 public:
+  Parser();
   void addOperator(std::string const& name, bool isFunction);
   std::vector<shToken> parse(std::string const& exp);
 
@@ -50,5 +51,5 @@ private:
   std::unordered_set<std::string> operators;
   std::unordered_set<std::string> functions;
   std::set<size_t> sizes;
-  State state;
+  std::unique_ptr<State> state;
 };

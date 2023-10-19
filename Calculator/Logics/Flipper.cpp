@@ -3,7 +3,7 @@
 #include "../Operators/Operator.h"
 
 Flipper::Flipper(Solver* parent)
-  : solver(parent)
+  : solver(parent), state(std::make_unique<State>())
 {}
 
 bool PriorityCompare(EPriority low, EPriority high) {
@@ -18,22 +18,22 @@ bool Flipper::isHigherPriority(shToken const& low, shToken const& high) const {
 }
 
 bool Flipper::flipNone(Tokens const& tokens, std::string& msg) {
-  size_t idx = this->state.idx++;
+  size_t idx = this->state->idx++;
   msg = "Flipper: Unknown token : \'" + tokens[idx]->name + "\'";
   return false;
 }
 
 bool Flipper::flipNumber(Tokens const& tokens, std::string& msg) {
-  size_t idx = this->state.idx++;
-  this->state.out.push_back(tokens[idx]);
+  size_t idx = this->state->idx++;
+  this->state->out.push_back(tokens[idx]);
   return true;
 }
 
 bool Flipper::flipOperator(Tokens const& tokens, std::string& msg) {
-  size_t idx = this->state.idx++;
-  auto& st = this->state.stack;
+  size_t idx = this->state->idx++;
+  auto& st = this->state->stack;
   while (!st.empty() && this->isHigherPriority(tokens[idx], st.top())) {
-    this->state.out.push_back(st.top());
+    this->state->out.push_back(st.top());
     st.pop();
   }
 
@@ -42,18 +42,18 @@ bool Flipper::flipOperator(Tokens const& tokens, std::string& msg) {
 }
 
 bool Flipper::flipFunction(Tokens const& tokens, std::string& msg) {
-  size_t idx = this->state.idx++;
-  this->state.stack.push(tokens[idx]);
+  size_t idx = this->state->idx++;
+  this->state->stack.push(tokens[idx]);
   return true;
 }
 
 bool Flipper::flipSeparator(Tokens const& tokens, std::string& msg) {
   using Type = Token::EType;
 
-  size_t idx = this->state.idx++;
-  auto& st = this->state.stack;
+  size_t idx = this->state->idx++;
+  auto& st = this->state->stack;
   while (!st.empty() && st.top()->type != Type::T_LEFT_BRACKET) {
-    this->state.out.push_back(st.top());
+    this->state->out.push_back(st.top());
     st.pop();
   }
 
@@ -65,18 +65,18 @@ bool Flipper::flipSeparator(Tokens const& tokens, std::string& msg) {
 }
 
 bool Flipper::flipLeftBracket(Tokens const& tokens, std::string& msg) {
-  size_t idx = this->state.idx++;
-  this->state.stack.push(tokens[idx]);
+  size_t idx = this->state->idx++;
+  this->state->stack.push(tokens[idx]);
   return true;
 }
 
 bool Flipper::flipRightBracket(Tokens const& tokens, std::string& msg) {
   using Type = Token::EType;
 
-  size_t idx = this->state.idx++;
-  auto& st = this->state.stack;
+  size_t idx = this->state->idx++;
+  auto& st = this->state->stack;
   while (!st.empty() && st.top()->type != Type::T_LEFT_BRACKET) {
-    this->state.out.push_back(st.top());
+    this->state->out.push_back(st.top());
     st.pop();
   }
 
@@ -87,7 +87,7 @@ bool Flipper::flipRightBracket(Tokens const& tokens, std::string& msg) {
   st.pop();
   
   if (!st.empty() && st.top()->type == Type::T_FUNCTION) {
-    this->state.out.push_back(st.top());
+    this->state->out.push_back(st.top());
     st.pop();
   }
   return true;
@@ -95,7 +95,7 @@ bool Flipper::flipRightBracket(Tokens const& tokens, std::string& msg) {
 
 bool Flipper::flipToken(Tokens const& tokens, std::string& msg) {
   using Type = Token::EType;
-  switch (tokens[this->state.idx]->type) {
+  switch (tokens[this->state->idx]->type) {
   case Type::T_NONE:
     return this->flipNone(tokens, msg);
   case Type::T_NUMBER:
@@ -119,26 +119,26 @@ bool Flipper::flipToken(Tokens const& tokens, std::string& msg) {
 bool Flipper::flipState(Tokens& tokens, std::string& msg) {
   using Type = Token::EType;
 
-  auto& st = this->state.stack;
+  auto& st = this->state->stack;
   while (!st.empty()) {
     if (st.top()->type == Type::T_LEFT_BRACKET) {
       msg = "Flipper: Closing bracket not found";
       return false;
     }
 
-    this->state.out.push_back(st.top());
+    this->state->out.push_back(st.top());
     st.pop();
   }
 
-  tokens = std::move(this->state.out);
+  tokens = std::move(this->state->out);
   msg = "Flipper: Success";
   return true;
 }
 
 bool Flipper::flip(Tokens& tokens, std::string& msg) {
-  this->state = State();
+  *this->state = State();
   
-  while (this->state.idx < tokens.size()) {
+  while (this->state->idx < tokens.size()) {
     if (!this->flipToken(tokens, msg))
       return false;
   }

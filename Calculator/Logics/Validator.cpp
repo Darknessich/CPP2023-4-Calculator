@@ -3,7 +3,7 @@
 #include "../Operators/Operator.h"
 
 Validator::Validator(Solver* parent)
-  : solver(parent)
+  : solver(parent), state(std::make_unique<State>())
 {}
 
 size_t Max(size_t a, size_t b) {
@@ -38,18 +38,18 @@ bool Validator::isRightOperand(shToken const& token) const {
 bool Validator::isBeforeRightBracket(shToken const& token) const {
   using Type = Token::EType;
   return this->isLeftOperand(token) ||
-    (this->state.inFunction && token->type == Type::T_LEFT_BRACKET);
+    (this->state->inFunction && token->type == Type::T_LEFT_BRACKET);
 }
 
 bool Validator::validateNone(Tokens const& tokens, std::string& msg) {
-  size_t idx = this->state.idx++;
+  size_t idx = this->state->idx++;
   msg = "Validator: Unknown token : \'" + tokens[idx]->name + "\'";
   return false;
 }
 
 bool Validator::validateNumber(Tokens const& tokens, std::string& msg) {
-  this->state.func.args = Max(this->state.func.args, 1);
-  size_t idx = this->state.idx++;
+  this->state->func.args = Max(this->state->func.args, 1);
+  size_t idx = this->state->idx++;
   if (idx == 0 || !this->isLeftOperand(tokens[idx - 1]))
     return true;
 
@@ -58,7 +58,7 @@ bool Validator::validateNumber(Tokens const& tokens, std::string& msg) {
 }
 
 bool Validator::validateOperator(Tokens const& tokens, std::string& msg) {
-  size_t idx = this->state.idx++;
+  size_t idx = this->state->idx++;
   auto op = this->solver->getOperator(tokens[idx]->name);
 
   if (op == nullptr) {
@@ -86,15 +86,15 @@ bool Validator::validateOperator(Tokens const& tokens, std::string& msg) {
 bool Validator::validateFunction(Tokens const& tokens, std::string& msg) {
   using Type = Token::EType;
 
-  size_t idx = this->state.idx++;
+  size_t idx = this->state->idx++;
 
-  if (this->state.inFunction) {
-    this->state.func.args = Max(this->state.func.args, 1);
-    this->state.st.push(this->state.func);
+  if (this->state->inFunction) {
+    this->state->func.args = Max(this->state->func.args, 1);
+    this->state->st.push(this->state->func);
   }
 
-  this->state.inFunction = true;
-  this->state.func = State::FunctionInfo{ idx, 0, 0 };
+  this->state->inFunction = true;
+  this->state->func = State::FunctionInfo{ idx, 0, 0 };
 
   if (idx == tokens.size() - 1 || tokens[idx + 1]->type != Type::T_LEFT_BRACKET) {
     msg = "Validator: Expected opening brackets for function \'" + tokens[idx]->name + "\'";
@@ -109,10 +109,10 @@ bool Validator::validateFunction(Tokens const& tokens, std::string& msg) {
 }
 
 bool Validator::validateSeparator(Tokens const& tokens, std::string& msg) {
-  this->state.func.args++;
-  size_t idx = this->state.idx++;
+  this->state->func.args++;
+  size_t idx = this->state->idx++;
 
-  if (!this->state.inFunction) {
+  if (!this->state->inFunction) {
     msg = "Validator: Separator found outside function";
     return false;
   }
@@ -128,10 +128,10 @@ bool Validator::validateSeparator(Tokens const& tokens, std::string& msg) {
 }
 
 bool Validator::validateLeftBracket(Tokens const& tokens, std::string& msg) {
-  size_t idx = this->state.idx++;
-  this->state.brackets++;
-  if (this->state.inFunction)
-    this->state.func.brackets++;
+  size_t idx = this->state->idx++;
+  this->state->brackets++;
+  if (this->state->inFunction)
+    this->state->func.brackets++;
 
   if (idx == 0 || !this->isLeftOperand(tokens[idx - 1]))
     return true;
@@ -141,7 +141,7 @@ bool Validator::validateLeftBracket(Tokens const& tokens, std::string& msg) {
 }
 
 bool Validator::validateFunctionArgs(Tokens const& tokens, std::string& msg) {
-  size_t idx = this->state.func.fidx;
+  size_t idx = this->state->func.fidx;
 
   auto func = this->solver->getOperator(tokens[idx]->name);
 
@@ -150,41 +150,41 @@ bool Validator::validateFunctionArgs(Tokens const& tokens, std::string& msg) {
     return false;
   }
 
-  if (func->getnArgs() == this->state.func.args)
+  if (func->getnArgs() == this->state->func.args)
     return true;
 
   msg = "Validator: Function \'" + tokens[idx]->name +
     "\' takes " + std::to_string(func->getnArgs()) +
-    " arguments rather than " + std::to_string(this->state.func.args);
+    " arguments rather than " + std::to_string(this->state->func.args);
   return false;
 }
 
 bool Validator::validateRightBracket(Tokens const& tokens, std::string& msg) {
-  size_t idx = this->state.idx++;
-  this->state.brackets--;
+  size_t idx = this->state->idx++;
+  this->state->brackets--;
 
   if (idx == 0 || !isBeforeRightBracket(tokens[idx - 1])) {
     msg = "Validator: Operand expected but bracket \'" + tokens[idx]->name + "\' found";
     return false;
   }
 
-  if (!this->state.inFunction || (--this->state.func.brackets != 0))
+  if (!this->state->inFunction || (--this->state->func.brackets != 0))
     return true;
 
   if (!this->validateFunctionArgs(tokens, msg))
     return false;
 
-  this->state.inFunction = !this->state.st.empty();
-  if (this->state.inFunction) {
-    this->state.func = this->state.st.top();
-    this->state.st.pop();
+  this->state->inFunction = !this->state->st.empty();
+  if (this->state->inFunction) {
+    this->state->func = this->state->st.top();
+    this->state->st.pop();
   }
   return true;
 }
 
 bool Validator::validateToken(Tokens const& tokens, std::string& msg) {
   using Type = Token::EType;
-  switch (tokens[this->state.idx]->type) {
+  switch (tokens[this->state->idx]->type) {
   case Type::T_NONE:
     return this->validateNone(tokens, msg);
   case Type::T_NUMBER:
@@ -206,14 +206,14 @@ bool Validator::validateToken(Tokens const& tokens, std::string& msg) {
 }
 
 bool Validator::validateState(Tokens const& tokens, std::string& msg) {
-  if (this->state.inFunction) {
-    msg = "Validator: Closing bracket of the function \'" + tokens[this->state.func.fidx]->name + "\' not found";
+  if (this->state->inFunction) {
+    msg = "Validator: Closing bracket of the function \'" + tokens[this->state->func.fidx]->name + "\' not found";
     return false;
   }
 
-  if (this->state.brackets != 0) {
-    msg = "Validator: " + std::to_string(std::abs(this->state.brackets)) +
-      (this->state.brackets > 0 ? " closing " : " opening ") +
+  if (this->state->brackets != 0) {
+    msg = "Validator: " + std::to_string(std::abs(this->state->brackets)) +
+      (this->state->brackets > 0 ? " closing " : " opening ") +
       "brackets not found!";
     return false;
   }
@@ -223,9 +223,9 @@ bool Validator::validateState(Tokens const& tokens, std::string& msg) {
 }
 
 bool Validator::validate(Tokens const& tokens, std::string& msg) {
-  this->state = State();
+  *this->state = State();
 
-  while (this->state.idx < tokens.size()) {
+  while (this->state->idx < tokens.size()) {
     if (!this->validateToken(tokens, msg))
       return false;
   }

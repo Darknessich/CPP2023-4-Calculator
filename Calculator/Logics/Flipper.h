@@ -34,6 +34,6 @@ public:
   bool flip(Tokens& tokens, std::string& msg);
 
 private:
-  Solver* solver;
-  State state;
+  Solver* const solver;
+  std::unique_ptr<State> state;
 };

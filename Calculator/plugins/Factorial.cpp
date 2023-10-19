@@ -18,6 +18,7 @@ public:
   EPriority getPriority() const override { return EPriority::P_UPPER; }
   EFormat getFormat() const override { return EFormat::F_POSTFIX; }
   std::string getName() const override { return "!"; }
+  std::string getDescription() const override { return "int(n)!"; }
   size_t getnArgs() const override { return 1; }
 
   void setArg(size_t narg, double arg) override { args[narg] = static_cast<int>(arg); }

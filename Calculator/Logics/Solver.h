@@ -12,10 +12,12 @@
 #include "Flipper.h"
 
 class Solver {
+  template<class T>
+  using uptr = std::unique_ptr<T>;
+
   using shToken = std::shared_ptr<Token>;
   using Tokens = std::vector<shToken>;
-  using unqOperator = std::unique_ptr<Operator>;
-  using Operators = std::unordered_map<std::string, unqOperator>;
+  using Operators = std::unordered_map<std::string, uptr<Operator>>;
 
   double calculateToken(shToken const& token, bool& ok, std::string& msg);
   double calculateState(bool& ok, std::string& msg);
@@ -28,9 +30,9 @@ public:
   double calculate(std::string const& expression, bool& ok, std::string& msg);
 
 private:
-  Parser parser;
-  Validator validator;
-  Flipper flipper;
+  uptr<Parser> parser;
+  uptr<Validator> validator;
+  uptr<Flipper> flipper;
 
   Tokens tokens;
   Operators operators;

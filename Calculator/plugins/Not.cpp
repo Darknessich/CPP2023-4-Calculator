@@ -9,6 +9,7 @@ public:
   EPriority getPriority() const override { return EPriority::P_UPPER; }
   EFormat getFormat() const override { return EFormat::F_PREFIX; }
   std::string getName() const override { return "not"; }
+  std::string getDescription() const override { return "(bool) not a"; }
   size_t getnArgs() const override { return 1; }
 
   void setArg(size_t narg, double arg) override { args[narg] = arg; }

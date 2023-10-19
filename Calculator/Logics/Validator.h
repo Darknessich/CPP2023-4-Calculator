@@ -45,6 +45,6 @@ public:
   bool validate(Tokens const& tokens, std::string& msg);
 
 private:
-  Solver* solver;
-  State state;
+  Solver* const solver;
+  std::unique_ptr<State> state;
 };

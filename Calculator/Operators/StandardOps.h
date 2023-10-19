@@ -11,6 +11,7 @@ public:
   double operator()() const override;
   std::string getName() const override;
   EPriority getPriority() const override;
+  std::string getDescription() const override;
   void setArg(size_t narg, double arg) override;
 private:
   double args[2] = { 0 };
@@ -21,6 +22,7 @@ public:
   double operator()() const override;
   std::string getName() const override;
   EPriority getPriority() const override;
+  std::string getDescription() const override;
   void setArg(size_t narg, double arg) override;
 private:
   double args[2] = { 0 };
@@ -31,6 +33,7 @@ public:
   double operator()() const override;
   std::string getName() const override;
   EPriority getPriority() const override;
+  std::string getDescription() const override;
   void setArg(size_t narg, double arg) override;
 private:
   double args[2] = { 0 };
@@ -41,6 +44,7 @@ public:
   double operator()() const override;
   std::string getName() const override;
   EPriority getPriority() const override;
+  std::string getDescription() const override;
   void setArg(size_t narg, double arg) override;
 private:
   double args[2] = { 0 };
