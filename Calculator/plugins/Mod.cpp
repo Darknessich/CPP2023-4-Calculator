@@ -1,8 +1,12 @@
 #include "../Operators/Operator.h"
+#include <limits>
 
 class Mod : public Operator {
 public:
   double operator()() const override { 
+    if (args[1] == 0)
+      return std::numeric_limits<double>::infinity();
+    
     int result = args[0] % args[1];
     return result < 0? args[1] + result : result; 
   }

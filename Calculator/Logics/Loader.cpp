@@ -2,14 +2,10 @@
 
 void Loader::getFabric(std::string const& path) {
   HMODULE hm = LoadLibraryA(path.c_str());
+  creator = nullptr;
 
-  if (hm == nullptr)
-    throw LoaderErr(("File \"" + path + "\" not found").c_str());
-
+  if (hm == nullptr) return;
   creator = reinterpret_cast<Fabric>(GetProcAddress(hm, "create"));
-
-  if (!creator) 
-    throw LoaderErr(("Òo instance of the function \"Operator* create(void)\" in \"" + path + "\"").c_str());
 }
 
 Loader::Loader(std::string const& path)

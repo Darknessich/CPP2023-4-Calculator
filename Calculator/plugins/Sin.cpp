@@ -5,7 +5,7 @@
 
 class Sin : public Function {
 public:
-  double operator()() const override { return std::sin(args[0] / 180.0 * M_PI); }
+  double operator()() const override { return std::sin((args[0] * M_PI) / 180.0); }
   std::string getName() const override { return "sin"; }
 
   size_t getnArgs() const override { return 1; }

@@ -2,20 +2,15 @@
 #include <string>
 #include <memory>
 #include <windows.h>
-#include <exception>
 
-#include "Operators/Operator.h"
-
-class LoaderErr : public std::exception {
-public:
-  using std::exception::exception;
-};
+#include "../Operators/Operator.h"
 
 class Loader {
   using unqOperator = std::unique_ptr<Operator>;
   using Fabric = Operator*(*)(void);
 
   void getFabric(std::string const& path);
+
 public:
   Loader(std::string const& path);
   ~Loader() noexcept;

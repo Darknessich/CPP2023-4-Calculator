@@ -5,7 +5,7 @@
 
 class Cos : public Function {
 public:
-  double operator()() const override { return std::cos(args[0] / 180.0 * M_PI); }
+  double operator()() const override { return std::cos((args[0] * M_PI) / 180.0); }
   std::string getName() const override { return "cos"; }
 
   size_t getnArgs() const override { return 1; }
