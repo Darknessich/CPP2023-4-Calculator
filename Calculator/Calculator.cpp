@@ -1,31 +1,28 @@
 ﻿#include "Calculator.h"
-#include "Loader.h"
 
 Calculator::Calculator(int argc, char* argv[]) 
-  : pluginsPath(argc > 1? argv[1] : "plugins")
+  : pluginsPath(argc > 1? argv[1] : "plugins"), solver(std::make_unique<Solver>())
 {
-  size_t plugins = 0;
-
-  try {
-    plugins = solver.loadPlugins(this->pluginsPath);
-    std::cout << "[ INFO] " << plugins << " plugins loaded successfully" << std::endl;
-  } catch (LoaderErr& err) {
-    std::cerr << "[ERROR] " << err.what() << std::endl;
-    throw;
-  }
+  auto plugins = solver->loadPlugins(this->pluginsPath);
+  std::cout << "[ INFO] (" << plugins.first << " / " << plugins.second;
+  std::cout << ") plugins loaded successfully" << std::endl;
 }
 
 int Calculator::exec(std::istream& is, std::ostream& os) {
+  std::string exp, msg;
+  bool check;
+
+  os << "[ INFO] Available operators:" << std::endl;
+  solver->printInfo(os);
+
   os << "[ INFO] Enter ^Z (EOF) for exit" << std::endl;
-  std::string exp;
   std::getline(is, exp);
   while (!is.eof()) {
-    try {
-      double result = solver.calculate(exp);
+    double result = solver->calculate(exp, check, msg);
+    if (check)
       os << "\t= " << result << std::endl;
-    } catch (SolverErr& err) {
-      os << "[ERROR] " << err.what() << std::endl;
-    }
+    else
+      os << "[ERROR] " << msg << std::endl;
     std::getline(is, exp);
   }
 

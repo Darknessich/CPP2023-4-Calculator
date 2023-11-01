@@ -1,18 +1,17 @@
 #pragma once
 #include <vector>
+#include <memory>
 
 #include "Operator.h"
 
-std::vector<Operator*> getStandardOps();
+std::vector<std::unique_ptr<Operator>> getStandardOps();
 
 class Plus : public Operator {
 public:
   double operator()() const override;
-  EPriority getPriority() const override;
   std::string getName() const override;
-  
-  bool isFunction() const override;
-  size_t getnArgs() const override;
+  EPriority getPriority() const override;
+  std::string getDescription() const override;
   void setArg(size_t narg, double arg) override;
 private:
   double args[2] = { 0 };
@@ -21,11 +20,9 @@ private:
 class Minus : public Operator {
 public:
   double operator()() const override;
-  EPriority getPriority() const override;
   std::string getName() const override;
-
-  bool isFunction() const override;
-  size_t getnArgs() const override;
+  EPriority getPriority() const override;
+  std::string getDescription() const override;
   void setArg(size_t narg, double arg) override;
 private:
   double args[2] = { 0 };
@@ -34,24 +31,20 @@ private:
 class Product : public Operator {
 public:
   double operator()() const override;
-  EPriority getPriority() const override;
   std::string getName() const override;
-
-  bool isFunction() const override;
-  size_t getnArgs() const override;
+  EPriority getPriority() const override;
+  std::string getDescription() const override;
   void setArg(size_t narg, double arg) override;
 private:
-  double args[2] = {0};
+  double args[2] = { 0 };
 };
 
 class Division : public Operator {
 public:
   double operator()() const override;
-  EPriority getPriority() const override;
   std::string getName() const override;
-
-  bool isFunction() const override;
-  size_t getnArgs() const override;
+  EPriority getPriority() const override;
+  std::string getDescription() const override;
   void setArg(size_t narg, double arg) override;
 private:
   double args[2] = { 0 };
